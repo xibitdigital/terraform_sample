@@ -14,29 +14,15 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-# resource "aws_instance" "web" {
-#   ami           = data.aws_ami.ubuntu.id
-#   instance_type = "t3.micro"
+module "my_ec2_instance" {
+  source = "./sample_instance"
 
-#   tags = {
-#     Name = "HelloWorld"
-#   }
-# }
+  ec2_instance_type   = var.ec2_instance_type
+  ec2_instance_name   = var.ec2_instance_name
+  ec2_ami             = data.aws_ami.ubuntu.id
+  number_of_instances = var.number_of_instances
+}
 
-resource "aws_instance" "foo" {
-  ami           = "ami-005e54dee72cc1d00" # us-west-2
-  instance_type = var.ec2_instance_type
-
-  network_interface {
-    network_interface_id = aws_network_interface.foo.id
-    device_index         = 0
-  }
-
-  credit_specification {
-    cpu_credits = "unlimited"
-  }
-
-  tags = {
-    "Name" = var.ec2_instance_name
-  }
+output "instance_id" {
+  value= module.my_ec2_instance.ec2_instance_id
 }
